@@ -55,12 +55,36 @@ function walk(dir: string, files: string[] = []) {
   return files
 }
 
+function isFieldApp(file: string) {
+  const rel = path.relative(out, file)
+  return rel === path.join("app", "field", "index.html") || rel.startsWith(path.join("app", "field") + path.sep)
+}
+
 const htmlFiles = walk(out).filter((file) => file.endsWith(".html") && !file.endsWith(`${path.sep}404.html`))
 for (const file of htmlFiles) {
   const html = fs.readFileSync(file, "utf8")
   assert.equal(/TODO|\[COLIN/i.test(html), false, file)
-  assert.match(html, /href="[^"]*sitemap\/?"/, file)
+  if (!isFieldApp(file)) assert.match(html, /href="[^"]*sitemap\/?"/, file)
 }
+
+const landing = fs.readFileSync(path.join(out, "app", "index.html"), "utf8")
+assert.match(landing, /<h1[^>]*>Log knocks, leads, and jobs from the door\.<\/h1>/)
+assert.match(landing, /Open the app/)
+assert.match(landing, /app\/field\/?/)
+assert.match(landing, /SoftwareApplication/)
+assert.match(landing, /Add to your home screen/)
+assert.match(landing, /iPhone/)
+assert.match(landing, /Android/)
+assert.match(landing, /Safari/)
+assert.match(landing, /Chrome/)
+assert.equal(/<meta[^>]*noindex/i.test(landing), false)
+for (const asset of ["sw.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"]) {
+  assert.equal(fs.existsSync(path.join(out, "app", "field", asset)), true, asset)
+}
+const fieldHtml = fs.readFileSync(path.join(out, "app", "field", "index.html"), "utf8")
+assert.match(fieldHtml, /noindex/)
+const home = fs.readFileSync(path.join(out, "index.html"), "utf8")
+assert.match(home, /g8xXrImbYSa3VNFJnbff/)
 
 function fileFor(url: string) {
   const pathname = new URL(url).pathname

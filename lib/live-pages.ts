@@ -99,6 +99,7 @@ export function livePages(): LivePage[] {
 
   pages.push(
     { group: "site", title: "Home", path: "/", lastmod: contentDate },
+    { group: "site", title: "Field app", path: slash("/app"), lastmod: contentDate },
     { group: "site", title: "Sitemap", path: slash("/sitemap"), lastmod: contentDate },
   )
 

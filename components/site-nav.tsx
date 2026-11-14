@@ -22,6 +22,11 @@ const links = [
     label: "Guide",
     match: (path: string) => path.startsWith("/door-to-door-sales"),
   },
+  {
+    href: "/app",
+    label: "Field",
+    match: (path: string) => path === "/app" || path.startsWith("/app/"),
+  },
 ]
 
 export function SiteNav({ className }: { className?: string }) {

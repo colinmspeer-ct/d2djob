@@ -21,7 +21,12 @@ function prefixFor(file) {
 function rewriteAttributeUrls(text, prefix) {
   return text.replace(/(href|src|srcset|poster|action)=(["'])([\s\S]*?)\2/g, (full, attr, quote, value) => {
     if (value.startsWith("data:") || value.startsWith("mailto:") || value.startsWith("tel:")) return full
-    const next = value.replace(/(^|,\s*)\/(?!\/)/g, `$1${prefix}`)
+    // Next's client runtime looks up script tags by the absolute /_next/ URL.
+    // Rewriting those to relative paths leaves the runtime waiting on a chunk that never resolves.
+    const next = value.replace(/(^|,\s*)\/(?!\/)/g, (match, lead, offset, whole) => {
+      if (whole.slice(offset + lead.length).startsWith("/_next/")) return match
+      return `${lead}${prefix}`
+    })
     return `${attr}=${quote}${next}${quote}`
   })
 }
