@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  slug          String      @id
+  city          String
+  state         String
+  stateName     String
+  county        String
+  filterGroup   String
+  isFiberMarket Boolean     @default(false)
+  fiberTier     String?
+  sortOrder     Int         @default(0)
+  candidates    Candidate[]
+  jobs          Job[]
+}
+
+model Industry {
+  slug       String              @id
+  name       String
+  geoPrefix  String              @unique
+  sortOrder  Int                 @default(0)
+  candidates CandidateIndustry[]
+  jobs       Job[]
+}
+
+model Candidate {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  realName        String
+  phone           String
+  email           String
+  interviewNotes  String
+  photoOriginal   String?
+  photoPublic     String?
+  pseudonym       String
+  headline        String   @default("")
+  summary         String   @default("")
+  background      String   @default("")
+  experience      String   @default("")
+  personality     String   @default("")
+  lookingFor      String   @default("")
+  yearsExperience Int?
+  salesType       String   @default("")
+  availability    String   @default("")
+  willingToTravel Boolean  @default(false)
+  payStructure    String   @default("")
+  workStyle       String   @default("")
+  schedule        String   @default("")
+  locationSlug    String
+  location        Location @relation(fields: [locationSlug], references: [slug])
+  industries      CandidateIndustry[]
+  isSample        Boolean  @default(false)
+  isPublished     Boolean  @default(false)
+  generationSource String?
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  requests        ContactRequest[]
+
+  @@index([isPublished])
+  @@index([locationSlug])
+}
+
+model CandidateIndustry {
+  candidateId  String
+  industrySlug String
+  candidate    Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  industry     Industry  @relation(fields: [industrySlug], references: [slug])
+
+  @@id([candidateId, industrySlug])
+}
+
+model ContactRequest {
+  id             String    @id @default(cuid())
+  candidateId    String
+  candidate      Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  type           String
+  name           String
+  company        String
+  email          String
+  phone          String
+  message        String
+  preferredTimes String    @default("")
+  status         String    @default("new")
+  emailStatus    String    @default("pending")
+  createdAt      DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+model Job {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  title              String
+  description        String
+  datePosted         String
+  validThrough       String
+  employmentType     String
+  hiringOrganization String
+  industrySlug       String
+  industry           Industry @relation(fields: [industrySlug], references: [slug])
+  locationSlug       String
+  location           Location @relation(fields: [locationSlug], references: [slug])
+  salaryMin          Int?
+  salaryMax          Int?
+  salaryUnit         String?
+  commissionNote     String   @default("")
+  isSample           Boolean  @default(false)
+  isPublished        Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([industrySlug])
+  @@index([locationSlug])
+}
