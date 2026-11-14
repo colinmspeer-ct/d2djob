@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 const heldMessage =
-  "Nothing was sent. This site is published as static files, and email delivery is not configured. A server with RESEND_API_KEY, NOTIFY_EMAIL, and NOTIFY_FROM would be required before the desk can receive this. Your message stayed in this browser."
+  "Not sent. This employer form does not deliver or save a message. Email is not configured on the published site, so the note stayed in this browser."
 
 export function RequestForm({ slug, type }: { slug: string; type: "invite" | "meeting" }) {
   const meeting = type === "meeting"
@@ -41,10 +41,10 @@ export function RequestForm({ slug, type }: { slug: string; type: "invite" | "me
     <form id={type} onSubmit={onSubmit} noValidate className="rounded-3xl bg-card p-5 ring-1 ring-foreground/10">
       <h2 className="text-2xl">{meeting ? "Request a meeting" : "Send an invite"}</h2>
       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-        Profile {slug} stays anonymous. This form does not email the desk from the published site.
+        Profile {slug} stays anonymous. Submitting does not send this invite or meeting request and does not store it.
       </p>
       {notice ? (
-        <p className="mt-3 rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary" role="status">
+        <p className="mt-3 rounded-xl bg-secondary px-3 py-2 text-sm" role="status">
           {notice}
         </p>
       ) : null}

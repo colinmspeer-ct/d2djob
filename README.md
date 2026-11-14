@@ -62,7 +62,7 @@ Finished copy is published for:
 
 City URLs that still had scaffold copy are not generated, not linked, and not listed in the sitemap. The talent desk, jobs hub, sample profiles, and sample job posts ship with those pages so the links resolve. Sample records stay marked Sample.
 
-Invite and meeting forms on the static site do not submit anywhere. Resend is not configured, and GitHub Pages has no server to store the request. The form tells the visitor that nothing was sent.
+Reps use the HighLevel form on the homepage and each industry page. Employer invite and meeting forms stay on profile pages and do not send or save anything.
 
 `/sitemap/` is the HTML list of every live page, linked from the footer. `/sitemap-index.xml` points at `/sitemap.xml`. Both include `<lastmod>`. `robots.txt` references them. Scaffold city URLs are omitted.
 

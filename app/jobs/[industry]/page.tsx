@@ -8,6 +8,7 @@ import { industryArticles } from "@/content/industry-pages";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
+import { CandidateMatchForm } from "@/components/candidate-match-form";
 import { PageShell } from "@/components/page-shell";
 import { payLine } from "@/lib/format";
 import { listPublicJobs } from "@/lib/queries";
@@ -124,6 +125,7 @@ export default async function Page(props: { params: Promise<{ industry: string }
             </div>
           ))}
         </section>
+        <CandidateMatchForm />
         <FaqList faqs={article.faqs} />
       </article>
     </PageShell>

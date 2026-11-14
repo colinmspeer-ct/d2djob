@@ -25,7 +25,7 @@ const faqs: Faq[] = [
   {
     question: "What is the difference between an invite and a meeting request?",
     answer:
-      "An invite says you want an introduction. A meeting request adds times that work. Both go to the desk. Alex still holds the rep’s contact details until there is a reason to connect you.",
+      "An invite is a note that you want an introduction. A meeting request adds times. On this published site those forms do not send or save anything. The rep’s phone number and email stay off the public page.",
   },
   {
     question: "Are the sample profiles people I can hire?",
@@ -73,8 +73,8 @@ export default function EmployersPage() {
             such as base plus commission or hourly plus commission. Do not invent a number they did not ask for.
           </p>
           <p className="leading-relaxed">
-            The form does not reveal the rep. The desk matches your note to the private record and follows up. If email
-            sending is not configured, the request is still saved and marked as not sent.
+            The form does not reveal the rep. On the published site it also does not send or save the note. Nothing is
+            delivered to the desk from that form.
           </p>
         </section>
         <section className="grid gap-3">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/json-ld";
 import { ListingFilters } from "@/components/filters";
 import { LiveFilter } from "@/components/live-filter";
+import { CandidateMatchForm } from "@/components/candidate-match-form";
 import { PageShell } from "@/components/page-shell";
 import { ProfileCard } from "@/components/profile-card";
 import { listPublicCandidates } from "@/lib/queries";
@@ -74,6 +75,9 @@ export default async function Home() {
             ))}
           </ul>
         )}
+      </section>
+      <section className="mx-auto max-w-3xl px-4 pb-10">
+        <CandidateMatchForm />
       </section>
     </PageShell>
   );
