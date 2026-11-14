@@ -9,6 +9,10 @@ import { buildJobPosting } from "@/lib/job-posting";
 import { labelFor, EMPLOYMENT_TYPES } from "@/lib/labels";
 import { getPublicJob } from "@/lib/queries";
 import { siteUrl } from "@/lib/site";
+import { getIndustry } from "@/data/industries";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { FaqList } from "@/components/faq-list";
+import { breadcrumbJsonLd, clipDescription, faqJsonLd, seoMetadata, type Crumb, type Faq } from "@/lib/seo";
 
 export function generateStaticParams() {
   return sampleJobs.map((job) => ({ slug: job.slug }));
@@ -18,11 +22,8 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const { slug } = await props.params;
   const job = await getPublicJob(slug);
   if (!job) return { title: "Job" };
-  return {
-    title: job.title,
-    description: job.description.slice(0, 180).replace(/\s+/g, " "),
-    alternates: { canonical: `/job/${job.slug}` },
-  };
+  const title = `${job.industryName} job in ${job.city}, ${job.state}`;
+  return seoMetadata(title, clipDescription(job.description), `/job/${job.slug}`);
 }
 
 export const instant = false;
@@ -56,29 +57,42 @@ function JobDetail({ job }: { job: NonNullable<Awaited<ReturnType<typeof getPubl
     commissionNote: job.commissionNote,
     siteUrl: site,
   });
-  const crumbs = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Jobs", item: `${site}/jobs` },
-      { "@type": "ListItem", position: 2, name: job.industryName, item: `${site}/jobs/${job.industrySlug}` },
-      { "@type": "ListItem", position: 3, name: job.title, item: `${site}/job/${job.slug}` },
-    ],
-  };
+  const industry = getIndustry(job.industrySlug);
+  const cityPath = industry ? `/${industry.geoPrefix}/${job.locationSlug}` : "/jobs";
+  const crumbs: Crumb[] = [
+    { name: "Home", path: "/" },
+    { name: "Door-to-Door Sales Jobs", path: "/door-to-door-sales" },
+    { name: job.industryName, path: `/jobs/${job.industrySlug}` },
+    { name: `${job.city}, ${job.state}`, path: cityPath },
+    { name: job.title, path: `/job/${job.slug}` },
+  ];
+  const faqs: Faq[] = [
+    {
+      question: job.isSample
+        ? "Is this door to door sales job a live opening?"
+        : "Is this listing still the place to read the offer?",
+      answer: job.isSample
+        ? "No. This record is marked Sample. It shows the shape of a listing. It is not a requisition you can accept."
+        : "Read the description and the valid-through date on this page. The desk unpublishes listings that are no longer open.",
+    },
+    {
+      question: "How is the pay described?",
+      answer: job.commissionNote
+        ? `The listing says: ${job.commissionNote} Any dollar figure on a sample record is demo data, not a quote.`
+        : "Read the pay line on this page. Commission, base plus commission, and hourly plus commission are different plans.",
+    },
+    {
+      question: `Where is the ${job.industryName.toLowerCase()} route?`,
+      answer: `The job location is ${job.city}, ${job.state}. The city page for this trade has the local knocking notes, and the industry page explains the work without the street detail.`,
+    },
+  ];
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
       <JsonLd data={{ "@context": "https://schema.org", ...posting }} />
-      <JsonLd data={crumbs} />
-      <p className="text-sm text-muted-foreground">
-        <Link href="/jobs" className="hover:text-foreground">
-          Jobs
-        </Link>
-        {" / "}
-        <Link href={`/jobs/${job.industrySlug}`} className="hover:text-foreground">
-          {job.industryName}
-        </Link>
-      </p>
+      <JsonLd data={breadcrumbJsonLd(crumbs)} />
+      <JsonLd data={faqJsonLd(faqs)} />
+      <Breadcrumbs items={crumbs} />
       <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
         <h1 className="text-4xl leading-[1.05]">{job.title}</h1>
         {job.isSample ? (
@@ -110,13 +124,26 @@ function JobDetail({ job }: { job: NonNullable<Awaited<ReturnType<typeof getPubl
         </div>
       </dl>
       <div className="mt-8 space-y-4 leading-relaxed whitespace-pre-wrap">{job.description}</div>
-      <p className="mt-8 text-sm text-muted-foreground">
-        To talk about a listing, start on the{" "}
-        <Link href="/employers" className="underline-offset-4 hover:underline">
+      <p className="mt-8 leading-relaxed">
+        Local notes for this trade are on the{" "}
+        <Link href={cityPath} className="font-medium text-clay hover:underline">
+          {job.city} city page
+        </Link>
+        . The work in general is on the{" "}
+        <Link href={`/jobs/${job.industrySlug}`} className="font-medium text-clay hover:underline">
+          {job.industryName.toLowerCase()} sales jobs
+        </Link>{" "}
+        page and the{" "}
+        <Link href="/door-to-door-sales" className="font-medium text-clay hover:underline">
+          door-to-door sales jobs
+        </Link>{" "}
+        guide. Hiring managers start on the{" "}
+        <Link href="/employers" className="font-medium text-clay hover:underline">
           employers page
         </Link>
         . This preview does not take public applications.
       </p>
+      <FaqList faqs={faqs} />
     </article>
   );
 }

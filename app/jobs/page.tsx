@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { getIndustry } from "@/data/industries";
 import { getLocation } from "@/data/locations";
 import { ListingFilters } from "@/components/filters";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
 import { formatDate, one, payLine } from "@/lib/format";
@@ -11,36 +12,105 @@ import { buildJobPostingGraph, type JobPostingInput } from "@/lib/job-posting";
 import { labelFor, EMPLOYMENT_TYPES } from "@/lib/labels";
 import { listPublicJobs, type PublicJob } from "@/lib/queries";
 import { siteUrl } from "@/lib/site";
+import { breadcrumbJsonLd, faqJsonLd, seoMetadata, type Crumb, type Faq } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Door to Door Sales Jobs",
-  description:
-    "Door to door sales jobs and d2d sales jobs by industry and city. Fiber roles are listed in official AT&T Fiber markets. Other trades include South Jersey, the Philadelphia suburbs, Lancaster, Chicago, and Boston.",
-  alternates: { canonical: "/jobs" },
-  openGraph: {
-    title: "Door to Door Sales Jobs",
-    description: "Filter door-to-door and d2d sales jobs by industry and city.",
-    url: "/jobs",
+const title = "Door-to-Door Sales Jobs";
+const description =
+  "Door to door sales jobs and d2d sales jobs by industry and city, from fiber markets to pest, roofing, windows, and summer routes.";
+
+export const metadata: Metadata = seoMetadata(title, description, "/jobs");
+
+const crumbs: Crumb[] = [
+  { name: "Home", path: "/" },
+  { name: "Door-to-Door Sales Jobs", path: "/jobs" },
+];
+
+const faqs: Faq[] = [
+  {
+    question: "Which door to door sales jobs are on this hub?",
+    answer:
+      "Published listings for fiber, pest control, roofing, windows and doors, window cleaning, exterior cleaning, and other exterior sales. Sample badges mean the record is demo data, not a live offer.",
   },
-};
+  {
+    question: "Why are some cities missing from fiber filters?",
+    answer:
+      "Fiber listings are limited to official AT&T Fiber markets. South Jersey, the Philadelphia suburbs, Lancaster, Chicago, and Boston can still appear for other trades.",
+  },
+  {
+    question: "How do I read a d2d sales job listing?",
+    answer:
+      "Check the city, the product, the season, and how pay is described. Commission on a signature is not the same as commission on an install. The dollar amount, if any, is on that listing and may be a sample.",
+  },
+];
 
-export default function JobsPage(props: {
+export const instant = false;
+
+export default async function JobsPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const params = await props.searchParams;
+  const industry = getIndustry(one(params.industry)) ? one(params.industry) : "";
+  const location = getLocation(one(params.location)) ? one(params.location) : "";
+  const jobs = await listPublicJobs(industry, location);
+
   return (
     <PageShell>
-      <section className="mx-auto max-w-6xl px-4 pt-10 pb-2 sm:pt-14">
-        <p className="text-sm font-medium tracking-wide text-clay">Jobs hub</p>
-        <h1 className="mt-2 max-w-3xl text-4xl leading-[1.02] sm:text-6xl">Door to door sales jobs</h1>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Openings for door-to-door and d2d sales work, sorted by industry and city. Fiber seats are listed only in
-          official AT&T Fiber markets. Pest, roofing, windows, and exterior work can sit in other cities, including
-          South Jersey, the Philadelphia suburbs, Lancaster, Chicago, and Boston.
+      <article className="mx-auto max-w-6xl px-4 py-10">
+        <JsonLd data={breadcrumbJsonLd(crumbs)} />
+        <JsonLd data={faqJsonLd(faqs)} />
+        <JsonLd data={buildJobPostingGraph(jobs.map(toPosting))} />
+        <Breadcrumbs items={crumbs} />
+        <p className="mt-4 text-sm font-medium tracking-wide text-clay">Jobs hub</p>
+        <h1 className="mt-2 max-w-3xl text-4xl leading-[1.02] sm:text-6xl">Door-to-Door Sales Jobs</h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed">
+          These are door to door sales jobs and d2d sales jobs you can filter by trade and city. Fiber seats stay in
+          official AT&T Fiber markets. Pest, roofing, windows, and exterior work can sit in South Jersey, the
+          Philadelphia suburbs, Lancaster, Chicago, and Boston. The guide to the work itself is{" "}
+          <Link href="/door-to-door-sales" className="font-medium text-clay hover:underline">
+            door-to-door sales jobs
+          </Link>
+          .
         </p>
-      </section>
-      <Suspense fallback={<p className="mx-auto max-w-6xl px-4 py-10 text-sm">Loading listings…</p>}>
-        <JobResults searchParams={props.searchParams} />
-      </Suspense>
+        <div className="mt-8">
+          <ListingFilters basePath="/jobs" industry={industry} location={location} />
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          {jobs.length} {jobs.length === 1 ? "listing" : "listings"}. A Sample badge means the record is demo data, not a
+          live requisition.
+        </p>
+        {jobs.length === 0 ? (
+          <p className="mt-8 rounded-3xl bg-card px-5 py-10 text-center ring-1 ring-foreground/10">
+            No published job matches that filter.
+          </p>
+        ) : (
+          <ul className="mt-6 grid gap-4">
+            {jobs.map((job) => (
+              <li key={job.slug}>
+                <Link href={`/job/${job.slug}`} className="desk-card block rounded-3xl bg-card p-5 ring-1 ring-foreground/10">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-2xl leading-snug">{job.title}</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {job.city}, {job.state} · {job.industryName} · {labelFor(EMPLOYMENT_TYPES, job.employmentType)}
+                      </p>
+                    </div>
+                    {job.isSample ? (
+                      <span className="rounded-full bg-[#f3e4c4] px-2 py-1 text-[0.68rem] font-medium tracking-wide text-[#6a4b12] uppercase">
+                        Sample
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed">{payLine(job)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Posted {formatDate(job.datePosted)}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-10">
+          <FaqList faqs={faqs} />
+        </div>
+      </article>
     </PageShell>
   );
 }
@@ -62,57 +132,4 @@ function toPosting(job: PublicJob): JobPostingInput {
     commissionNote: job.commissionNote,
     siteUrl: siteUrl(),
   };
-}
-
-async function JobResults({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = await searchParams;
-  const industry = getIndustry(one(params.industry)) ? one(params.industry) : "";
-  const location = getLocation(one(params.location)) ? one(params.location) : "";
-  const jobs = await listPublicJobs(industry, location);
-
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-      <JsonLd data={buildJobPostingGraph(jobs.map(toPosting))} />
-      <ListingFilters basePath="/jobs" industry={industry} location={location} />
-      <p className="mt-6 text-sm text-muted-foreground">
-        {jobs.length} {jobs.length === 1 ? "listing" : "listings"}. Sample badges are demo records, not live requisitions.
-      </p>
-      {jobs.length === 0 ? (
-        <p className="mt-8 rounded-3xl bg-card px-5 py-10 text-center ring-1 ring-foreground/10">
-          No published job matches that filter.
-        </p>
-      ) : (
-        <ul className="mt-6 grid gap-4">
-          {jobs.map((job) => (
-            <li key={job.slug}>
-              <Link
-                href={`/job/${job.slug}`}
-                className="desk-card block rounded-3xl bg-card p-5 ring-1 ring-foreground/10"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-2xl leading-snug">{job.title}</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {job.city}, {job.state} · {job.industryName} · {labelFor(EMPLOYMENT_TYPES, job.employmentType)}
-                    </p>
-                  </div>
-                  {job.isSample ? (
-                    <span className="rounded-full bg-[#f3e4c4] px-2 py-1 text-[0.68rem] font-medium tracking-wide text-[#6a4b12] uppercase">
-                      Sample
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-3 text-sm leading-relaxed">{payLine(job)}</p>
-                <p className="mt-2 text-sm text-muted-foreground">Posted {formatDate(job.datePosted)}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
 }

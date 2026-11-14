@@ -2,10 +2,13 @@ import Link from "next/link"
 import type { industries } from "@/data/industries"
 import type { LocationRecord } from "@/data/locations"
 import { fiberMarkets, locations } from "@/data/locations"
+import { Breadcrumbs } from "@/components/breadcrumbs"
+import { JsonLd } from "@/components/json-ld"
 import { TodoCallout } from "@/components/todo-callout"
 import { payLine } from "@/lib/format"
 import { labelFor, EMPLOYMENT_TYPES } from "@/lib/labels"
 import type { PublicJob } from "@/lib/queries"
+import { breadcrumbJsonLd, type Crumb } from "@/lib/seo"
 
 type Industry = (typeof industries)[number]
 
@@ -23,19 +26,17 @@ export function GeoScaffold({
       ? fiberMarkets().filter((item) => item.slug !== location.slug && item.state === location.state)
       : locations.filter((item) => item.filterGroup === location.filterGroup && item.slug !== location.slug)
 
+  const crumbs: Crumb[] = [
+    { name: "Home", path: "/" },
+    { name: "Door-to-Door Sales Jobs", path: "/door-to-door-sales" },
+    { name: `${industry.name} sales jobs`, path: `/jobs/${industry.slug}` },
+    { name: `${location.city}, ${location.state}`, path: `/${industry.geoPrefix}/${location.slug}` },
+  ]
+
   return (
     <article className="mx-auto grid max-w-3xl gap-6 px-4 py-10">
-      <p className="text-sm text-muted-foreground">
-        <Link href="/jobs" className="hover:text-foreground">
-          Jobs
-        </Link>
-        {" / "}
-        <Link href={`/jobs/${industry.slug}`} className="hover:text-foreground">
-          {industry.name}
-        </Link>
-        {" / "}
-        {location.city}
-      </p>
+      <JsonLd data={breadcrumbJsonLd(crumbs)} />
+      <Breadcrumbs items={crumbs} />
       <h1 className="text-4xl leading-[1.05] sm:text-5xl">
         {industry.name} sales jobs in {location.city}, {location.state}
       </h1>

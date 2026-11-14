@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { placeLabel } from "@/data/locations";
 import { Avatar } from "@/components/avatar";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
 import { candidateTags } from "@/components/profile-card";
 import { RequestForm } from "@/components/request-form";
@@ -11,6 +12,7 @@ import { one } from "@/lib/format";
 import { labelFor, SCHEDULES, WORK_STYLES } from "@/lib/labels";
 import { getPublicCandidate } from "@/lib/queries";
 import { sampleCandidates } from "@/data/samples";
+import { breadcrumbJsonLd, clipDescription, seoMetadata, type Crumb } from "@/lib/seo";
 
 export function generateStaticParams() {
   return sampleCandidates.map((candidate) => ({ slug: candidate.slug }));
@@ -22,11 +24,12 @@ export async function generateMetadata(props: {
   const { slug } = await props.params;
   const candidate = await getPublicCandidate(slug);
   if (!candidate) return { title: "Profile" };
-  return {
-    title: `${candidate.pseudonym} — ${candidate.city}, ${candidate.state}`,
-    description: candidate.summary,
-    alternates: { canonical: `/candidates/${candidate.slug}` },
-  };
+  const title = `${candidate.pseudonym}, ${candidate.city} ${candidate.state}`;
+  return seoMetadata(
+    title,
+    clipDescription(candidate.summary),
+    `/candidates/${candidate.slug}`,
+  );
 }
 
 export const instant = false;
@@ -36,30 +39,35 @@ export default async function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await props.params;
+  const query = await props.searchParams;
   const candidate = await getPublicCandidate(slug);
   if (!candidate) notFound();
   return (
     <PageShell>
-      <Suspense fallback={<p className="px-4 py-10 text-sm text-muted-foreground">Loading profile…</p>}>
-        <Profile candidate={candidate} searchParams={props.searchParams} />
-      </Suspense>
+      <Profile candidate={candidate} sent={one(query.sent)} />
     </PageShell>
   );
 }
 
 async function Profile({
   candidate,
-  searchParams,
+  sent,
 }: {
   candidate: NonNullable<Awaited<ReturnType<typeof getPublicCandidate>>>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  sent: string;
 }) {
-  const query = await searchParams;
-  const sent = one(query.sent);
   const tags = candidateTags(candidate);
+  const crumbs: Crumb[] = [
+    { name: "Home", path: "/" },
+    { name: `${candidate.pseudonym}, ${candidate.city}`, path: `/candidates/${candidate.slug}` },
+  ];
 
   return (
     <article className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="lg:col-span-2">
+        <JsonLd data={breadcrumbJsonLd(crumbs)} />
+        <Breadcrumbs items={crumbs} />
+      </div>
       <div>
         {candidate.isSample ? (
           <p className="mb-4 rounded-2xl bg-[#fbf6ea] px-4 py-3 text-sm text-[#5c4a1d]">
