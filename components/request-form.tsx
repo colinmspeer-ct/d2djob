@@ -1,48 +1,56 @@
 "use client"
 
-import { useActionState } from "react"
-import { submitRequest } from "@/lib/actions/requests"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useFormStatus } from "react-dom"
 
-function Submit({ label }: { label: string }) {
-  const { pending } = useFormStatus()
-  return (
-    <Button type="submit" className="h-10 px-3.5" disabled={pending}>
-      {pending ? "Sending…" : label}
-    </Button>
-  )
-}
+const heldMessage =
+  "Nothing was sent. This site is published as static files, and email delivery is not configured. A server with RESEND_API_KEY, NOTIFY_EMAIL, and NOTIFY_FROM would be required before the desk can receive this. Your message stayed in this browser."
 
-export function RequestForm({
-  slug,
-  type,
-  sent,
-}: {
-  slug: string
-  type: "invite" | "meeting"
-  sent: boolean
-}) {
-  const [state, action] = useActionState(submitRequest.bind(null, slug, type), null)
+export function RequestForm({ slug, type }: { slug: string; type: "invite" | "meeting" }) {
   const meeting = type === "meeting"
+  const [notice, setNotice] = useState<string | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const email = String(data.get("email") || "")
+    const name = String(data.get("name") || "").trim()
+    const company = String(data.get("company") || "").trim()
+    const phone = String(data.get("phone") || "").trim()
+    const message = String(data.get("message") || "").trim()
+    const times = String(data.get("preferredTimes") || "").trim()
+    if (String(data.get("website") || "").trim()) {
+      setProblem(null)
+      setNotice(heldMessage)
+      return
+    }
+    if (!name || !company || !phone || !message || (meeting && !times) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNotice(null)
+      setProblem("Fill in every required field, including a valid email, before submitting.")
+      return
+    }
+    setProblem(null)
+    setNotice(heldMessage)
+  }
 
   return (
-    <form id={type} action={action} className="rounded-3xl bg-card p-5 ring-1 ring-foreground/10">
+    <form id={type} onSubmit={onSubmit} noValidate className="rounded-3xl bg-card p-5 ring-1 ring-foreground/10">
       <h2 className="text-2xl">{meeting ? "Request a meeting" : "Send an invite"}</h2>
       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-        This goes to the desk. The rep’s phone and email are not on this page.
+        Profile {slug} stays anonymous. This form does not email the desk from the published site.
       </p>
-      {sent ? (
+      {notice ? (
         <p className="mt-3 rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary" role="status">
-          Saved. The desk has your request.
+          {notice}
         </p>
       ) : null}
-      {state?.error ? (
+      {problem ? (
         <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          {state.error}
+          {problem}
         </p>
       ) : null}
       <div className="mt-4 grid gap-3">
@@ -90,7 +98,9 @@ export function RequestForm({
             className="min-h-16 bg-background"
           />
         </div>
-        <Submit label={meeting ? "Request a meeting" : "Send invite"} />
+        <Button type="submit" className="h-10 px-3.5">
+          {meeting ? "Request a meeting" : "Send invite"}
+        </Button>
       </div>
     </form>
   )

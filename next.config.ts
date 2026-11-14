@@ -1,8 +1,18 @@
 import type { NextConfig } from "next";
 
+const staticExport = process.env.STATIC_EXPORT === "1";
+
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  ...(staticExport
+    ? {
+        output: "export" as const,
+        trailingSlash: true,
+        images: { unoptimized: true },
+      }
+    : {
+        cacheComponents: true,
+        partialPrefetching: true,
+      }),
   serverExternalPackages: ["sharp", "@prisma/client", "prisma"],
   experimental: {
     serverActions: {

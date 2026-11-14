@@ -2,7 +2,7 @@
 
 Recruiting desk for door-to-door sales, built for D2D Job (Swyft Marketing). Employers browse anonymized rep profiles. The jobs hub publishes door-to-door sales listings with `JobPosting` structured data. Alex’s admin desk turns interview notes into the public profile.
 
-This repo does not deploy anywhere and does not configure DNS. Set `NEXT_PUBLIC_SITE_URL` to whatever origin is actually serving the app.
+The public site is a static export for GitHub Pages. Canonical origin is `https://d2djob.com`. Admin still runs only on a Node server (`npm run dev` / `npm start`).
 
 ## Run it locally
 
@@ -50,17 +50,21 @@ South Jersey, the Philadelphia suburbs (Bucks, Montgomery, Delaware County, and 
 - Edit the draft and publish or unpublish it.
 - Invites and meeting requests are listed under Requests. The email hook uses Resend only when `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `NOTIFY_FROM` are all set. Otherwise it records the request and logs a stub.
 
-## SEO scaffolds
+## Pages that ship
 
-These routes have unique titles, descriptions, and canonicals. The long copy is marked TODO:
+Finished copy is published for:
 
 - `/door-to-door-sales`
-- `/jobs/fiber`, `/jobs/pest-control`, and the other industry pages
-- `/fiber-sales-jobs/[city]` for AT&T Fiber markets only
-- `/[industry]-sales-jobs/[city]` for the other trades, in any seeded city
 - `/employers`
+- all 7 industry pages under `/jobs/[industry]`
+- all 22 `/fiber-sales-jobs/[city]` pages, including Scranton and Wilkes-Barre
+- the 54 other-trade city pages that have finished copy (Cherry Hill, Voorhees, Mount Laurel, Doylestown, King of Prussia, West Chester, Lancaster, Chicago, and Boston, each for the six non-fiber trades)
 
-`/sitemap.xml` and `/robots.txt` are generated. `/admin` is disallowed.
+City URLs that still had scaffold copy are not generated, not linked, and not listed in the sitemap. The talent desk, jobs hub, sample profiles, and sample job posts ship with those pages so the links resolve. Sample records stay marked Sample.
+
+Invite and meeting forms on the static site do not submit anywhere. Resend is not configured, and GitHub Pages has no server to store the request. The form tells the visitor that nothing was sent.
+
+`/sitemap/` is the HTML list of every live page, linked from the footer. `/sitemap-index.xml` points at `/sitemap.xml`. Both include `<lastmod>`. `robots.txt` references them. Scaffold city URLs are omitted.
 
 ## Environment
 
@@ -79,18 +83,33 @@ These routes have unique titles, descriptions, and canonicals. The long copy is 
 
 ## Deploy
 
-Any Node host works.
+GitHub Actions (`.github/workflows/pages.yml`) exports the site and deploys it to GitHub Pages on every push to `main`. The published root includes `CNAME` with `d2djob.com` and `.nojekyll`.
 
-1. Set the env vars above. Point `NEXT_PUBLIC_SITE_URL` at the host you are actually publishing.
-2. For Postgres, set `provider = "postgresql"` in `prisma/schema.prisma`, set `DATABASE_URL`, then `npx prisma db push && npm run db:seed`.
-3. `npm run build` and `npm start` (or the host’s Next.js adapter).
-4. Unpublish the sample profiles and sample jobs before the site is public.
+```bash
+npm run build:pages
+```
 
-Do not change DNS for an existing production domain as part of standing this app up. Hook the domain up only when you mean to serve this build.
+That writes `out/`. `NEXT_PUBLIC_SITE_URL` during the Pages build is `https://d2djob.com`.
+
+DNS for the apex and www (set at the registrar, not in this repo):
+
+| Host | Type | Value |
+| --- | --- | --- |
+| `@` | A | `185.199.108.153` |
+| `@` | A | `185.199.109.153` |
+| `@` | A | `185.199.110.153` |
+| `@` | A | `185.199.111.153` |
+| `@` | AAAA | `2606:50c0:8000::153` |
+| `@` | AAAA | `2606:50c0:8001::153` |
+| `@` | AAAA | `2606:50c0:8002::153` |
+| `@` | AAAA | `2606:50c0:8003::153` |
+| `www` | CNAME | `colinmspeer-ct.github.io` |
+
+After GitHub’s domain check succeeds, turn on Enforce HTTPS in the repository Pages settings.
+
+`npm run dev` is the local Node app, including `/admin`. The desk password in `.env.example` is `local-desk`.
 
 ## What’s next
 
-1. Replace the TODO copy on the pillar, industry, geo, and employers pages.
-2. Turn on Resend (or another sender) with the three notify variables.
-3. Choose a host, set `NEXT_PUBLIC_SITE_URL`, and only then attach a domain.
-4. Unpublish sample records and add real candidates and jobs.
+1. Turn on Resend with `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `NOTIFY_FROM` on a server that can accept the invite form. The static site cannot send mail.
+2. Replace the sample profiles and sample jobs with live records.

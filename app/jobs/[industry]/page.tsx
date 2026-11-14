@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { industries, getIndustry, type IndustrySlug } from "@/data/industries";
-import { fiberMarkets, locations, locationsByGroup } from "@/data/locations";
+import { locationsByGroup } from "@/data/locations";
+import { publishedCities } from "@/lib/published";
 import { industryArticles } from "@/content/industry-pages";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FaqList } from "@/components/faq-list";
@@ -34,7 +35,7 @@ export default async function Page(props: { params: Promise<{ industry: string }
   if (!industry || !article) notFound();
 
   const jobs = await listPublicJobs(industry.slug, "");
-  const cities = industry.slug === "fiber" ? fiberMarkets() : locations;
+  const cities = publishedCities(industry.slug);
   const crumbs: Crumb[] = [
     { name: "Home", path: "/" },
     { name: "Door-to-Door Sales Jobs", path: "/door-to-door-sales" },

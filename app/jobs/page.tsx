@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getIndustry } from "@/data/industries";
-import { getLocation } from "@/data/locations";
 import { ListingFilters } from "@/components/filters";
+import { LiveFilter } from "@/components/live-filter";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
-import { formatDate, one, payLine } from "@/lib/format";
+import { formatDate, payLine } from "@/lib/format";
 import { buildJobPostingGraph, type JobPostingInput } from "@/lib/job-posting";
 import { labelFor, EMPLOYMENT_TYPES } from "@/lib/labels";
 import { listPublicJobs, type PublicJob } from "@/lib/queries";
@@ -45,13 +44,8 @@ const faqs: Faq[] = [
 
 export const instant = false;
 
-export default async function JobsPage(props: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = await props.searchParams;
-  const industry = getIndustry(one(params.industry)) ? one(params.industry) : "";
-  const location = getLocation(one(params.location)) ? one(params.location) : "";
-  const jobs = await listPublicJobs(industry, location);
+export default async function JobsPage() {
+  const jobs = await listPublicJobs("", "");
 
   return (
     <PageShell>
@@ -59,6 +53,7 @@ export default async function JobsPage(props: {
         <JsonLd data={breadcrumbJsonLd(crumbs)} />
         <JsonLd data={faqJsonLd(faqs)} />
         <JsonLd data={buildJobPostingGraph(jobs.map(toPosting))} />
+        <LiveFilter />
         <Breadcrumbs items={crumbs} />
         <p className="mt-4 text-sm font-medium tracking-wide text-clay">Jobs hub</p>
         <h1 className="mt-2 max-w-3xl text-4xl leading-[1.02] sm:text-6xl">Door-to-Door Sales Jobs</h1>
@@ -72,9 +67,9 @@ export default async function JobsPage(props: {
           .
         </p>
         <div className="mt-8">
-          <ListingFilters basePath="/jobs" industry={industry} location={location} />
+          <ListingFilters basePath="/jobs" industry="" location="" />
         </div>
-        <p className="mt-6 text-sm text-muted-foreground">
+        <p className="mt-6 text-sm text-muted-foreground" data-filter-count>
           {jobs.length} {jobs.length === 1 ? "listing" : "listings"}. A Sample badge means the record is demo data, not a
           live requisition.
         </p>
@@ -85,7 +80,13 @@ export default async function JobsPage(props: {
         ) : (
           <ul className="mt-6 grid gap-4">
             {jobs.map((job) => (
-              <li key={job.slug}>
+              <li
+                key={job.slug}
+                data-filter-item
+                data-industries={job.industrySlug}
+                data-location={job.locationSlug}
+                data-travel="1"
+              >
                 <Link href={`/job/${job.slug}`} className="desk-card block rounded-3xl bg-card p-5 ring-1 ring-foreground/10">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>

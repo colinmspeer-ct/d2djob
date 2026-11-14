@@ -8,7 +8,6 @@ import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
 import { candidateTags } from "@/components/profile-card";
 import { RequestForm } from "@/components/request-form";
-import { one } from "@/lib/format";
 import { labelFor, SCHEDULES, WORK_STYLES } from "@/lib/labels";
 import { getPublicCandidate } from "@/lib/queries";
 import { sampleCandidates } from "@/data/samples";
@@ -34,27 +33,21 @@ export async function generateMetadata(props: {
 
 export const instant = false;
 
-export default async function Page(props: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function Page(props: { params: Promise<{ slug: string }> }) {
   const { slug } = await props.params;
-  const query = await props.searchParams;
   const candidate = await getPublicCandidate(slug);
   if (!candidate) notFound();
   return (
     <PageShell>
-      <Profile candidate={candidate} sent={one(query.sent)} />
+      <Profile candidate={candidate} />
     </PageShell>
   );
 }
 
 async function Profile({
   candidate,
-  sent,
 }: {
   candidate: NonNullable<Awaited<ReturnType<typeof getPublicCandidate>>>;
-  sent: string;
 }) {
   const tags = candidateTags(candidate);
   const crumbs: Crumb[] = [
@@ -110,8 +103,8 @@ async function Profile({
         </p>
       </div>
       <aside className="grid content-start gap-4 lg:sticky lg:top-20">
-        <RequestForm slug={candidate.slug} type="invite" sent={sent === "invite"} />
-        <RequestForm slug={candidate.slug} type="meeting" sent={sent === "meeting"} />
+        <RequestForm slug={candidate.slug} type="invite" />
+        <RequestForm slug={candidate.slug} type="meeting" />
       </aside>
     </article>
   );
