@@ -98,6 +98,7 @@ export function livePages(): LivePage[] {
   }
 
   pages.push(
+    { group: "site", title: "Field app for reps", path: slash("/app"), lastmod: contentDate },
     { group: "site", title: "Home", path: "/", lastmod: contentDate },
     { group: "site", title: "Sitemap", path: slash("/sitemap"), lastmod: contentDate },
   )

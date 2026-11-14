@@ -21,6 +21,9 @@ function prefixFor(file) {
 function rewriteAttributeUrls(text, prefix) {
   return text.replace(/(href|src|srcset|poster|action)=(["'])([\s\S]*?)\2/g, (full, attr, quote, value) => {
     if (value.startsWith("data:") || value.startsWith("mailto:") || value.startsWith("tel:")) return full
+    // Next's client runtime finds chunks by the exact /_next/ src it emitted.
+    // Rewriting those to relative paths leaves the runtime waiting on a script tag it cannot see.
+    if (value.startsWith("/_next/") || value.includes(" /_next/")) return full
     const next = value.replace(/(^|,\s*)\/(?!\/)/g, `$1${prefix}`)
     return `${attr}=${quote}${next}${quote}`
   })

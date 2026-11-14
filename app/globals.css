@@ -157,3 +157,8 @@ details > summary {
 details > summary::-webkit-details-marker {
   display: none;
 }
+
+.field-status:has(input:checked) {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
