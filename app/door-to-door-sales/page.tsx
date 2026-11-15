@@ -65,9 +65,9 @@ export default function GuidePage() {
             ))}
           </ul>
           <p className="leading-relaxed">
-            Open listings, including sample records marked as samples, sit on the{" "}
+            Open listings, including sample records marked as samples, are kept on their own page.{" "}
             <Link href="/jobs" className="font-medium text-clay hover:underline">
-              door to door sales jobs hub
+              Browse current D2D sales job openings
             </Link>
             .
           </p>

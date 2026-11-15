@@ -72,7 +72,7 @@ export function livePages(): LivePage[] {
 
   pages.push({
     group: "jobs",
-    title: "Door-to-Door Sales Jobs",
+    title: "Current Door-to-Door Sales Job Openings",
     path: slash("/jobs"),
     lastmod: contentDate,
   })
