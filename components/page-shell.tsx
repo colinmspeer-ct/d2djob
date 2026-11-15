@@ -85,7 +85,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
               <li>
                 <Link className="hover:text-foreground" href="/jobs">
-                  Door to door sales jobs
+                  Current job openings
                 </Link>
               </li>
               <li>
@@ -95,7 +95,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
               </li>
               <li>
                 <Link className="hover:text-foreground" href="/door-to-door-sales">
-                  Door to door sales guide
+                  Door-to-door sales jobs
                 </Link>
               </li>
               <li>

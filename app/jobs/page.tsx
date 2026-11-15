@@ -13,20 +13,20 @@ import { listPublicJobs, type PublicJob } from "@/lib/queries";
 import { siteUrl } from "@/lib/site";
 import { breadcrumbJsonLd, faqJsonLd, seoMetadata, type Crumb, type Faq } from "@/lib/seo";
 
-const title = "Door-to-Door Sales Jobs";
+const title = "D2D Sales Job Openings – Browse Current Roles";
 const description =
-  "Door to door sales jobs and d2d sales jobs by industry and city, from fiber markets to pest, roofing, windows, and summer routes.";
+  "Browse current door-to-door sales job openings by trade and city. A Sample badge means the record is demo data, not a live offer.";
 
 export const metadata: Metadata = seoMetadata(title, description, "/jobs");
 
 const crumbs: Crumb[] = [
   { name: "Home", path: "/" },
-  { name: "Door-to-Door Sales Jobs", path: "/jobs" },
+  { name: "Current Door-to-Door Sales Job Openings", path: "/jobs" },
 ];
 
 const faqs: Faq[] = [
   {
-    question: "Which door to door sales jobs are on this hub?",
+    question: "Which openings are listed on this page?",
     answer:
       "Published listings for fiber, pest control, roofing, windows and doors, window cleaning, exterior cleaning, and other exterior sales. Sample badges mean the record is demo data, not a live offer.",
   },
@@ -55,14 +55,16 @@ export default async function JobsPage() {
         <JsonLd data={buildJobPostingGraph(jobs.map(toPosting))} />
         <LiveFilter />
         <Breadcrumbs items={crumbs} />
-        <p className="mt-4 text-sm font-medium tracking-wide text-clay">Jobs hub</p>
-        <h1 className="mt-2 max-w-3xl text-4xl leading-[1.02] sm:text-6xl">Door-to-Door Sales Jobs</h1>
+        <p className="mt-4 text-sm font-medium tracking-wide text-clay">Open listings</p>
+        <h1 className="mt-2 max-w-3xl text-4xl leading-[1.02] sm:text-6xl">
+          Current Door-to-Door Sales Job Openings
+        </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed">
-          These are door to door sales jobs and d2d sales jobs you can filter by trade and city. Fiber seats stay in
-          official AT&T Fiber markets. Pest, roofing, windows, and exterior work can sit in South Jersey, the
-          Philadelphia suburbs, Lancaster, Chicago, and Boston. The guide to the work itself is{" "}
+          Filter current door-to-door roles by trade and city. Fiber seats stay in official AT&T Fiber markets. Pest,
+          roofing, windows, and exterior work can sit in South Jersey, the Philadelphia suburbs, Lancaster, Chicago,
+          and Boston. A Sample badge means the record is demo data, not a live offer. Read the guide to{" "}
           <Link href="/door-to-door-sales" className="font-medium text-clay hover:underline">
-            door-to-door sales jobs
+            learn what door-to-door sales jobs involve
           </Link>
           .
         </p>
