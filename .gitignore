@@ -53,3 +53,7 @@ swyftinternational/node_modules
 swyftinternational/.next
 swyftinternational/.data
 swyftinternational/test-results
+
+# cloudflare local state and secrets
+.wrangler/
+.dev.vars

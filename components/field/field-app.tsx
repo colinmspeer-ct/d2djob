@@ -81,6 +81,8 @@ export function FieldApp() {
   const snapshot = useRef("")
   const offline = !useSyncExternalStore(subscribeOnline, onlineSnapshot, onlineServerSnapshot)
   const dayLabel = useSyncExternalStore(subscribeClock, daySnapshot, dayServerSnapshot)
+  const nowMs = useSyncExternalStore(subscribeClock, () => Date.now(), () => 0)
+  const now = new Date(nowMs)
 
   useEffect(() => {
     let cancel = false
@@ -237,10 +239,10 @@ export function FieldApp() {
   }
 
   const ready = data !== null
-  const stats = data ? statsToItems(todayStats(data.leads)) : statsToItems(todayStats([]))
-  const todayStops = data ? leadsOnDay(data.leads) : []
+  const stats = data ? statsToItems(todayStats(data.leads, now)) : statsToItems(todayStats([], now))
+  const todayStops = data ? leadsOnDay(data.leads, now) : []
   const filtered = data ? filterLeads(data.leads, query, statusFilter, industryFilter) : []
-  const follow = data ? splitFollowUps(data.leads) : { due: [], later: [] }
+  const follow = data ? splitFollowUps(data.leads, now) : { due: [], later: [] }
   const leadsMessage = !data || data.leads.length === 0 ? emptyLeads : filtered.length === 0 ? emptySearch : ""
 
   return (
