@@ -86,6 +86,9 @@ for (const agent of ["GPTBot", "ClaudeBot", "FacebookBot", "Meta-ExternalAgent",
   assert.match(robots, new RegExp(`User-Agent: ${agent}\\s+Allow: /`))
 }
 assert.equal(/Disallow:\s*\/\s*$/m.test(robots), false)
+for (const path of ["/admin", "/training", "/library"]) {
+  assert.match(robots, new RegExp(`Disallow: ${path}`))
+}
 assert.match(robots, /Sitemap: https:\/\/d2djob\.com\/sitemap-index\.xml/)
 assert.match(robots, /Sitemap: https:\/\/d2djob\.com\/sitemap\.xml/)
 assert.equal(fs.readFileSync(path.join(out, "CNAME"), "utf8").trim(), "d2djob.com")

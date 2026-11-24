@@ -1,0 +1,10 @@
+{
+  "name": "@swyft/training-library",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Site-scoped training library for Cloudflare Workers, D1, and R2. Mount it on d2djob.com or swyftinternational.com.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

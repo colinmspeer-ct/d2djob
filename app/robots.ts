@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PRIVATE_PREFIXES } from "@/lib/private-paths";
 import { siteUrl } from "@/lib/site";
 
 const crawlers = [
@@ -25,6 +26,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: crawlers.map((userAgent) => ({
       userAgent,
       allow: "/",
+      disallow: [...PRIVATE_PREFIXES],
     })),
     sitemap: [`${siteUrl()}/sitemap-index.xml`, `${siteUrl()}/sitemap.xml`],
     host: siteUrl(),

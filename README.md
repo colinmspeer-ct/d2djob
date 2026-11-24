@@ -107,9 +107,22 @@ DNS for the apex and www (set at the registrar, not in this repo):
 
 After GitHub’s domain check succeeds, turn on Enforce HTTPS in the repository Pages settings.
 
-`npm run dev` is the local Node app, including `/admin`. The desk password in `.env.example` is `local-desk`.
+`npm run dev` is the local Node app, including `/admin`. The desk password in `.env.example` is `local-desk`. It uses SQLite and does not share data with the production desk.
+
+## Production desk
+
+The live desk and training library are a Cloudflare Worker, described in [DEPLOY.md](DEPLOY.md). Marketing pages stay the `out/` export. `/admin` and `/training` are served by the Worker, stored in D1, with uploads in R2.
+
+```bash
+cp .dev.vars.example .dev.vars
+npx wrangler d1 migrations apply d2djob --local --persist-to .wrangler/state
+npm run worker:dev
+```
+
+The local Worker password in `.dev.vars.example` is `local-desk`. It is hashed into D1 on first boot.
 
 ## What’s next
 
-1. Turn on Resend with `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `NOTIFY_FROM` on a server that can accept the invite form. The static site cannot send mail.
-2. Replace the sample profiles and sample jobs with live records.
+1. Deploy the Worker with [DEPLOY.md](DEPLOY.md). Point DNS at it only after the workers.dev preview matches the marketing pages.
+2. Turn on Resend with `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `NOTIFY_FROM` on that Worker. The static pages still do not submit the employer forms. The desk can log a request, and `POST /api/requests` is ready for a later form change.
+3. Replace the sample profiles and sample jobs with live records. Publishing in the desk does not rewrite the static pages yet.

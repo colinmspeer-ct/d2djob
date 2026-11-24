@@ -1,6 +1,7 @@
 import fs from "node:fs"
 import path from "node:path"
 import { absoluteLiveUrl, livePages } from "../lib/live-pages"
+import { PRIVATE_PREFIXES } from "../lib/private-paths"
 
 const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://d2djob.com").replace(/\/$/, "")
 const out = path.resolve("out")
@@ -44,7 +45,7 @@ const agents = [
 ]
 
 const robots = [
-  ...agents.map((agent) => `User-Agent: ${agent}\nAllow: /`),
+  ...agents.map((agent) => `User-Agent: ${agent}\nAllow: /\n${PRIVATE_PREFIXES.map((path) => `Disallow: ${path}`).join("\n")}`),
   "",
   `Sitemap: ${site}/sitemap-index.xml`,
   `Sitemap: ${site}/sitemap.xml`,

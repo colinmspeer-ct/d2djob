@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "d2djob",
+  "main": "worker/src/index.ts",
+  "compatibility_date": "2026-11-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  // Uncomment only when the workers.dev preview matches the marketing pages.
+  // The first deploy with these routes attaches d2djob.com and changes DNS.
+  // "routes": [
+  //   { "pattern": "d2djob.com", "custom_domain": true },
+  //   { "pattern": "www.d2djob.com", "custom_domain": true }
+  // ],
+  "assets": {
+    "directory": "./out",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/admin", "/admin/*", "/training", "/training/*", "/library", "/library/*", "/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "d2djob",
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "migrations_dir": "worker/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FILES",
+      "bucket_name": "d2djob-files"
+    }
+  ],
+  "vars": {
+    "TRAINING_SITE_ID": "d2djob"
+  }
+}
