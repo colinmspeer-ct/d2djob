@@ -1,0 +1,12 @@
+# Copy to .dev.vars for `npm run worker:dev`. Never commit .dev.vars.
+# ADMIN_PASSWORD is hashed into D1 on first boot. It is not stored in the repo.
+ADMIN_PASSWORD=local-desk
+ADMIN_SESSION_SECRET=local-session-secret-change-me
+
+# Optional.
+# OPENAI_API_KEY=
+# OPENAI_MODEL=gpt-4o-mini
+# OPENAI_BASE_URL=https://api.openai.com/v1
+# RESEND_API_KEY=
+# NOTIFY_EMAIL=
+# NOTIFY_FROM=
