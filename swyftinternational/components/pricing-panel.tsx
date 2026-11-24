@@ -1,7 +1,21 @@
 import Link from "next/link";
 import { balanceAfterDeposit, formatUsd, successFeeCents, type PlacementTerms } from "@/lib/terms";
 
-export function PricingPanel({ terms, salaryDollars }: { terms: PlacementTerms; salaryDollars: number }) {
+function withBasePath(basePath: string, path: string) {
+  const base = basePath.replace(/\/$/, "");
+  if (!base) return path;
+  return `${base}${path}`;
+}
+
+export function PricingPanel({
+  terms,
+  salaryDollars,
+  basePath = "",
+}: {
+  terms: PlacementTerms;
+  salaryDollars: number;
+  basePath?: string;
+}) {
   const fee = successFeeCents(salaryDollars * 100, terms.successFeePercent);
   const balance = balanceAfterDeposit(fee, terms.depositCents);
   return (
@@ -27,7 +41,7 @@ export function PricingPanel({ terms, salaryDollars }: { terms: PlacementTerms; 
           <p className="mt-3 text-sm leading-6 text-ink/75">Days. If the hire leaves inside the window, the replacement search is free.</p>
         </article>
       </div>
-      <form action="/pricing" className="mt-6 rounded-[1.6rem] bg-white p-5 ring-1 ring-ink/10">
+      <form action={withBasePath(basePath, "/pricing")} className="mt-6 rounded-[1.6rem] bg-white p-5 ring-1 ring-ink/10">
         <div className="flex flex-wrap items-end gap-3">
           <label className="grid gap-1 text-sm">
             <span className="font-medium">First-year salary</span>
@@ -53,7 +67,7 @@ export function PricingPanel({ terms, salaryDollars }: { terms: PlacementTerms; 
         </dl>
         <p className="mt-4 text-sm leading-6 text-ink/70">
           The fee, the deposit, and the replacement window are settings Colin can change. A database match skips the deposit.{" "}
-          <Link href="/employers/start" className="font-semibold text-glacier">
+          <Link href={withBasePath(basePath, "/app")} className="font-semibold text-glacier">
             Start a search
           </Link>
         </p>

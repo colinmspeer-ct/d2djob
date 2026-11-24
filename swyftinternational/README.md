@@ -47,3 +47,22 @@ Stripe Checkout runs only with an `sk_test_` secret. `sk_live_` and `rk_live_` a
 ## Sample people
 
 The six seeded profiles are invented. Three are in Egypt and three are in Belize. Avatars are generated initials, not photographs. Intro videos are empty frames until a file is attached on the desk.
+
+## Brand previews in this branch
+
+Three additional brand sites are rendered from one shared codebase and one brand config module:
+
+- `http://127.0.0.1:43124/vaccelerating`
+- `http://127.0.0.1:43124/outboundrep`
+- `http://127.0.0.1:43124/inboundrep`
+
+Each brand has:
+
+- landing page with Organization + Service + FAQ schema
+- pricing page
+- app view page
+- privacy and terms pages
+- HTML sitemap (`/sitemap`) linked in the footer
+- XML sitemap (`/sitemap.xml`), `robots.txt`, and `llms.txt`
+
+The app-view pages are configuration-driven (brand name/domain/colors/copy/roles/pricing defaults/site tag) and remain preview-only with Stripe test mode.
