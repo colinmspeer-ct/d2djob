@@ -1,0 +1,15 @@
+# Preview bindings for a later Cloudflare deploy.
+# Do not run `wrangler deploy` from this folder. This app does not change DNS.
+name = "swyft-international-preview"
+compatibility_date = "2026-11-24"
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "swyft-international"
+database_id = "local-preview-not-provisioned"
+migrations_dir = "d1"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "swyft-international-media"
