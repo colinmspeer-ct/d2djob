@@ -67,7 +67,7 @@ export default function PrivacyPage() {
           <p className="leading-relaxed">
             Swyft Solutions LLC
             <br />
-            63 War Trophy Ln, Media, PA 19063
+            Media, PA 19063
             <br />
             717-366-6714
             <br />
