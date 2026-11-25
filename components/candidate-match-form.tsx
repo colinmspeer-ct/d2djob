@@ -29,6 +29,20 @@ export function CandidateMatchForm() {
           title="D2D Job Candidate Form"
         />
       </div>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        The optional checkbox on the form is how you opt in to recruiting texts. Message
+        frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for
+        help. Consent is not a condition of applying. No mobile information will be shared
+        with third parties or affiliates for marketing or promotional purposes. See our{" "}
+        <a className="font-medium text-clay hover:underline" href="/privacy/">
+          Privacy Policy
+        </a>{" "}
+        and{" "}
+        <a className="font-medium text-clay hover:underline" href="/terms/">
+          Terms of Service
+        </a>
+        .
+      </p>
       <Script src="https://link.msgsndr.com/js/form_embed.js" strategy="afterInteractive" />
     </section>
   )

@@ -108,6 +108,16 @@ export function PageShell({ children }: { children: React.ReactNode }) {
                   Sitemap
                 </Link>
               </li>
+              <li>
+                <Link className="hover:text-foreground" href="/privacy">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-foreground" href="/terms">
+                  Terms of Service
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
