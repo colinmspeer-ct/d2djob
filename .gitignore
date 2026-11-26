@@ -40,6 +40,9 @@ yarn-error.log*
 /public/media
 /prisma/*.db
 /prisma/*.db-journal
+/prisma/prisma/
+/brand-sites/
+/.tmp/
 
 # vercel
 .vercel
