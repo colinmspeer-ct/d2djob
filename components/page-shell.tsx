@@ -99,6 +99,11 @@ export function PageShell({ children }: { children: React.ReactNode }) {
                 </Link>
               </li>
               <li>
+                <Link className="hover:text-foreground" href="/blog">
+                  Blog
+                </Link>
+              </li>
+              <li>
                 <Link className="hover:text-foreground" href="/app">
                   Field app
                 </Link>
