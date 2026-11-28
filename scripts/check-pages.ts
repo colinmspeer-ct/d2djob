@@ -93,6 +93,18 @@ assert.match(robots, /Sitemap: https:\/\/d2djob\.com\/sitemap-index\.xml/)
 assert.match(robots, /Sitemap: https:\/\/d2djob\.com\/sitemap\.xml/)
 assert.equal(fs.readFileSync(path.join(out, "CNAME"), "utf8").trim(), "d2djob.com")
 
+const rss = fs.readFileSync(path.join(out, "blog", "rss.xml"), "utf8")
+assert.match(rss, /<rss version="2\.0"/)
+assert.match(rss, /<\/channel><\/rss>\s*$/)
+assert.equal(rss.includes("sample-draft-post"), false)
+assert.equal(sitemap.includes("sample-draft-post"), false)
+assert.ok(sitemap.includes("https://d2djob.com/blog/"))
+const blogIndex = fs.readFileSync(path.join(out, "blog", "index.html"), "utf8")
+assert.equal((blogIndex.match(/<h1[ >]/g) ?? []).length, 1)
+assert.match(blogIndex, /rel="canonical"/)
+assert.match(blogIndex, /rss\+xml/)
+for (const block of blogIndex.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) JSON.parse(block[1])
+
 const counts = pages.reduce<Record<string, number>>((acc, page) => {
   acc[liveGroupLabel[page.group]] = (acc[liveGroupLabel[page.group]] || 0) + 1
   return acc

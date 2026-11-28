@@ -6,7 +6,7 @@ import { siteUrl } from "@/lib/site";
 
 const title = "Sitemap";
 const description =
-  "Every live D2D Job page, grouped into the sales guide, employers, industries, city pages, jobs, profiles, and the field app.";
+  "Every live D2D Job page, grouped into the sales guide, employers, industries, city pages, jobs, profiles, blog, and the field app.";
 
 export const metadata: Metadata = seoMetadata(title, description, "/sitemap");
 

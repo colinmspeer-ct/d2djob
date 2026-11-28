@@ -5,10 +5,12 @@ import { industries, type IndustrySlug } from "@/data/industries"
 import { getLocation } from "@/data/locations"
 import { sampleJobs } from "@/data/jobs"
 import { sampleCandidates } from "@/data/samples"
+import { blogMeta } from "@/content/blog"
+import { lastModified, publishedPosts } from "@/lib/blog"
 
 export const contentDate = "2026-11-14"
 
-export const liveGroups = ["pillar", "employers", "industries", "cities", "jobs", "profiles", "site"] as const
+export const liveGroups = ["pillar", "employers", "industries", "cities", "jobs", "profiles", "blog", "site"] as const
 
 export type LiveGroup = (typeof liveGroups)[number]
 
@@ -26,6 +28,7 @@ export const liveGroupLabel: Record<LiveGroup, string> = {
   cities: "City pages",
   jobs: "Jobs",
   profiles: "Profiles",
+  blog: "Blog",
   site: "Site",
 }
 
@@ -95,6 +98,11 @@ export function livePages(): LivePage[] {
       path: slash(`/candidates/${candidate.slug}`),
       lastmod: candidate.publishedAt.slice(0, 10),
     })
+  }
+
+  pages.push({ group: "blog", title: blogMeta.h1, path: slash(blogMeta.path), lastmod: contentDate })
+  for (const post of publishedPosts()) {
+    pages.push({ group: "blog", title: post.title, path: slash(`/blog/${post.slug}`), lastmod: lastModified(post) })
   }
 
   pages.push(
